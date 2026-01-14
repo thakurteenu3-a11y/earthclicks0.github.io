@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>EarthClicks — Nature Photography</title>
+  <meta name="description" content="A nature photography portfolio with gallery, blog, and contact." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#0f1216; --card:#151a21; --text:#e9eef6; --muted:#a9b3c1; --accent:#5bd1a8; --accent-2:#7aa7ff;
+      --border:#222832;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0; font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      color:var(--text); background:linear-gradient(180deg,#0b0e12 0%, #10151b 100%);
+    }
+    a{color:inherit; text-decoration:none}
+    img{max-width:100%; display:block}
+    /* Layout */
+    .container{width:100%; max-width:1100px; margin:0 auto; padding:0 20px}
+    header{
+      position:sticky; top:0; z-index:1000; backdrop-filter:saturate(1.2) blur(8px);
+      background:rgba(16,21,27,.7); border-bottom:1px solid var(--border);
+    }
+    .nav{
+      display:flex; align-items:center; justify-content:space-between; padding:14px 0;
+    }
+    .brand{display:flex; align-items:center; gap:10px; font-weight:800; letter-spacing:.2px}
+    .brand .logo{
+      width:34px; height:34px; border-radius:8px; background:linear-gradient(135deg,var(--accent),var(--accent-2));
+      display:grid; place-items:center; color:#0b0e12; font-weight:800;
+    }
+    .nav-links{display:flex; gap:18px}
+    .nav-links a{padding:8px 10px; border-radius:8px}
+    .nav-links a:hover{background:rgba(255,255,255,.06)}
+    .nav-actions{display:flex; gap:10px}
+    .btn{
+      padding:8px 12px; border:1px solid var(--border); border-radius:10px; background:var(--card); color:var(--text);
+    }
+    .btn.primary{background:linear-gradient(135deg,var(--accent),var(--accent-2)); color:#0b0e12; border:none; font-weight:700}
+    .menu-toggle{display:none}
+    /* Hero */
+    .hero{
+      display:grid; grid-template-columns:1.2fr .8fr; gap:24px; align-items:center; padding:40px 0 24px;
+    }
+    .hero h1{font-size:clamp(28px,4vw,44px); line-height:1.1; margin:0 0 12px}
+    .hero p{color:var(--muted); margin:0 0 18px}
+    .hero .tags{display:flex; gap:10px; flex-wrap:wrap}
+    .chip{border:1px solid var(--border); color:var(--muted); padding:6px 10px; border-radius:999px; font-size:14px}
+    .hero-card{
+      border:1px solid var(--border); border-radius:16px; overflow:hidden; background:var(--card);
+    }
+    .hero-card img{aspect-ratio:4/3; object-fit:cover}
+    .hero-card .caption{padding:12px 14px; color:var(--muted); font-size:14px}
+    /* Section */
+    section{padding:40px 0}
+    section .head{
+      display:flex; align-items:end; justify-content:space-between; margin-bottom:16px;
+    }
+    section h2{margin:0; font-size:clamp(22px,3vw,30px)}
+    section .sub{color:var(--muted)}
+    /* Gallery */
+    .filters{display:flex; gap:10px; flex-wrap:wrap; margin-bottom:16px}
+    .filters .btn{font-size:14px; padding:6px 10px}
+    .grid{
+      display:grid; gap:14px; grid-template-columns:repeat(3,1fr);
+    }
+    .card{
+      border:1px solid var(--border); border-radius:14px; overflow:hidden; background:var(--card);
+      transition:transform .2s ease, box-shadow .2s ease;
+    }
+    .card:hover{transform:translateY(-2px); box-shadow:0 10px 24px rgba(0,0,0,.25)}
+    .card img{aspect-ratio:4/3; object-fit:cover; cursor:pointer}
+    .card .meta{display:flex; justify-content:space-between; padding:10px 12px; font-size:14px; color:var(--muted)}
+    /* Lightbox */
+    .lightbox{
+      position:fixed; inset:0; background:rgba(0,0,0,.85); display:none; align-items:center; justify-content:center; z-index:2000;
+    }
+    .lightbox.open{display:flex}
+    .lightbox .inner{max-width:90vw; max-height:86vh; position:relative}
+    .lightbox img{max-width:100%; max-height:86vh; border-radius:12px}
+    .lightbox .close, .lightbox .prev, .lightbox .next{
+      position:absolute; top:50%; transform:translateY(-50%); background:rgba(255,255,255,.1); border:1px solid var(--border);
+      color:var(--text); padding:10px 12px; border-radius:10px; cursor:pointer; backdrop-filter:blur(6px);
+    }
+    .lightbox .close{top:10px; right:10px; transform:none}
+    .lightbox .prev{left:-56px}
+    .lightbox .next{right:-56px}
+    .lightbox .caption{position:absolute; bottom:-44px; left:0; right:0; color:var(--muted); text-align:center}
+    /* About */
+    .about{
+      display:grid; grid-template-columns:1fr 1fr; gap:20px;
+    }
+    .about .bio{
+      border:1px solid var(--border); border-radius:14px; padding:16px; background:var(--card)
+    }
+    .about .stats{
+      display:grid; grid-template-columns:repeat(3,1fr); gap:12px;
+    }
+    .stat{
+      border:1px solid var(--border); border-radius:14px; padding:14px; background:var(--card); text-align:center
+    }
+    .stat .num{font-size:24px; font-weight:800}
+    .stat .label{color:var(--muted); font-size:13px}
+    /* Contact */
+    form{
+      border:1px solid var(--border); border-radius:14px; padding:16px; background:var(--card)
+    }
+    .row{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+    label{display:block; font-size:14px; color:var(--muted); margin-bottom:6px}
+    input, textarea, select{
+      width:100%; padding:10px 12px; border-radius:10px; border:1px solid var(--border); background:#0e1217; color:var(--text)
+    }
+    textarea{min-height:120px; resize:vertical}
+    .form-actions{display:flex; gap:10px; align-items:center; margin-top:10px}
+    .notice{color:var(--muted); font-size:13px}
+    /* Footer */
+    footer{
+      border-top:1px solid var(--border); margin-top:30px; padding:20px 0; color:var(--muted)
+    }
+    .foot{
+      display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap
+    }
+    .social{display:flex; gap:10px}
+    .social a{border:1px solid var(--border); padding:8px 10px; border-radius:10px}
+    /* Responsive */
+    @media (max-width:900px){
+      .hero{grid-template-columns:1fr}
+      .grid, .blog-grid{grid-template-columns:repeat(2,1fr)}
+      .about{grid-template-columns:1fr}
+      .lightbox .prev{left:10px} .lightbox .next{right:10px}
+    }
+    @media (max-width:640px){
+      .nav-links{display:none}
+      .menu-toggle{display:inline-flex; align-items:center; gap:8px}
+      .grid, .blog-grid{grid-template-columns:1fr}
+      .row{grid-template-columns:1fr}
+      .stat .num{font-size:20px}
+    }
+    /* Mobile menu */
+    .mobile-menu{
+      display:none; border-top:1px solid var(--border); background:rgba(16,21,27,.8)
+    }
+    .mobile-menu.open{display:block}
+    .mobile-menu a{display:block; padding:12px 0; border-bottom:1px solid var(--border)}
+    /* Utility */
+    .hidden{display:none !important}
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <div class="container nav">
+      <div class="brand">
+        <div class="logo">EC</div>
+        <div>Earth Clicks</div>
+      </div>
+      <nav class="nav-links">
+        <a href="#gallery">Gallery</a>
+        <a href="#about">About</a>
+        <a href="#contact">Contact</a>
+      </nav>
+      <div class="nav-actions">
+        <button class="btn menu-toggle" id="menuToggle">Menu</button>
+      </div>
+    </div>
+    <div class="container mobile-menu" id="mobileMenu">
+      <a href="#gallery">Gallery</a>
+      <a href="#about">About</a>
+      <a href="#contact">Contact</a>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="container hero" id="home">
+    <div>
+      <h1>Nature, unfiltered—mountains, forests, and the quiet in‑between</h1>
+      <p>Capturing the wild beauty of Himanchal Pradesh-forests,rivers,mountains and more. Unfilterd moments from nature's sanctuary.</p>
+      <div class="tags">
+        <span class="chip">Landscape</span>
+        <span class="chip">Wildlife</span>
+        <span class="chip">Macro</span>
+        <span class="chip">Astro</span>
+        <span class="chip">Flowers</span>
+      </div>
+      <div style="margin-top:16px; display:flex; gap:10px">
+        <a class="btn primary" href="#gallery">View gallery</a>
+      </div>
+    </div>
+    <div class="hero-card">
+      <img src="C:\Users\thaku\OneDrive\ドキュメント\photo5.jpeg" alt="Image not found">
+      <div class="caption">"Nature's pathway through the mountains_calm and beautiful"</div>
+    </div>
+  </section>
+
+  <!-- Gallery -->
+  <section class="container" id="gallery">
+    <div class="head">
+      <h2>Gallery</h2>
+      <div class="sub">Curated sets—filter by biome or style</div>
+    </div>
+    <div class="filters">
+      <button class="btn" data-filter="all">All</button>
+      <button class="btn" data-filter="mountains">Mountains</button>
+      <button class="btn" data-filter="forest">Forest</button>
+      <button class="btn" data-filter="water">Water</button>
+      <button class="btn" data-filter="wildlife">Wildlife</button>
+      <button class="btn" data-filter="macro">Macro</button>
+      <button class="btn" data-filter="astro">Astro</button>
+      <button class="btn" data-filter="flowers">Flowers</button>
+    </div>
+    <div class="grid" id="galleryGrid">
+      <!-- Cards populated by JS -->
+    </div>
+  </section>
+
+  <!-- About -->
+  <section class="container" id="about">
+    <div class="head">
+      <h2>About</h2>
+      <div class="sub">Embracing the beauty of nature with patience and resect.</div>
+    </div>
+    <div class="about">
+      <div class="bio">
+        <h3 style="margin-top:0">Teenu Thakur</h3>
+        <p>Hello! I’m Teenu, a student with a deep love for nature photography. 📸
+          Capturing the beauty of forests, mountains, rivers, and every tiny detail in nature gives me peace and happiness.
+          Photography is not just a hobby for me — it’s a way to connect with the world around me and share its calm and magic with others.
+          Through my lens, I try to freeze moments of serenity and the simple wonders of nature, hoping to inspire others to appreciate the 
+          beauty of our planet. 🌲🌿✨</p>
+      </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  </section>
+
+  <!-- Contact -->
+  <!-- Contact Section -->
+<section id="contact" style="padding:50px; background:#f5f5f5; font-family:Arial, sans-serif;">
+  <h2 style="text-align:center; margin-bottom:30px;">Contact Me</h2>
+
+  <div style="max-width:600px; margin:auto; background:white; padding:30px; border-radius:10px; box-shadow:0 4px 8px rgba(0,0,0,0.1);">
+
+    <!-- Instagram Link -->
+    <p style="text-align:center; font-size:16px; margin-bottom:20px;">
+      Follow me on Instagram: 
+      <a href="https://www.instagram.com/_earthclicks0_/" target="blank" style="color:#0095f6; text-decoration:none;">_earthclicks0</a>
+    </p>
+
+    <!-- Contact Form -->
+    <form action="mailto:thakurteenu3@gmail.com" method="post" enctype="text/plain">
+      <label>Name:</label><br>
+      <input type="text" name="Name" placeholder="Your Name" required 
+             style="width:100%; padding:10px; margin:8px 0; border-radius:5px; border:1px solid #ccc;"><br>
+
+      <label>Email:</label><br>
+      <input type="email" name="Email" placeholder="Your Email" required
+             style="width:100%; padding:10px; margin:8px 0; border-radius:5px; border:1px solid #ccc;"><br>
+
+      <label>Message:</label><br>
+      <textarea name="Message" placeholder="Write your message here..." rows="5" required
+                style="width:100%; padding:10px; margin:8px 0; border-radius:5px; border:1px solid #ccc;"></textarea><br>
+
+      <button type="submit" style="background:#0095f6; color:white; padding:12px 20px; border:none; border-radius:5px; cursor:pointer; font-size:16px;">
+        Send Message
+      </button>
+    </form>
+    
+    <p style="text-align:center; margin-top:20px; font-size:14px; color:#555;">
+      Or email me directly at: <a href="mailto:thakurteenu3@gmail.com" style="color:#0095f6;">thakurteenu3@gmail.com</a>
+    </p>
+  </div>
+</section>
+  <!-- Footer -->
+  <footer>
+    <div class="container foot">
+      <div>© <span id="year"></span> Wild Lens — Nature Photography</div>
+      <div class="social">
+        <a href="#" aria-label="Instagram">Instagram</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Lightbox -->
+  <div class="lightbox" id="lightbox" aria-modal="true" role="dialog">
+    <div class="inner">
+      <img id="lightboxImg" alt="">
+      <button class="close" id="lightboxClose" aria-label="Close">✕</button>
+      <button class="prev" id="lightboxPrev" aria-label="Previous">←</button>
+      <button class="next" id="lightboxNext" aria-label="Next">→</button>
+      <div class="caption" id="lightboxCaption"></div>
+    </div>
+  </div>
+
+  <script>
+    // Data — replace with your own images/posts
+    const photos = [
+      {src:"photo5.jpeg", title:'Glacial dawn', tag:'mountains'},
+      {src:"trees.jpeg", title:'Cedar hush', tag:'forest'},
+      {src:"photo2.jpeg", title:'River', tag:'water'},
+      {src:"mimi.jpeg", title:'Lamb', tag:'wildlife'},
+      {src:"waterfall.jpeg", title:'Waterfall', tag:'water'},
+      {src:"jungle.jpeg", title:'Forest veil', tag:'forest'},
+      {src:"macro.jpeg", title:'Moss macro', tag:'macro'},
+      {src:"lake.jpeg", title:'River bend', tag:'water'},
+      {src:"kuru.jpeg", title:'Ibex dusk', tag:'wildlife'},
+      {src:"phool2.jpeg", title:'flower',tag:'flowers'},
+      {src:"phool.jpeg", title:'Petals of peace',tag:'flowers'},
+      {src:"macro1.jpeg", title:'leafs',tag:'macro'},
+    ];
+
+    const posts = [
+      {cover:"photo2.jpeg", title:'Chasing first light', date:'Jan 2026', read:'5 min', excerpt:'Why blue hour matters more than golden hour in alpine terrain.'},
+      {cover:"trees.jpeg", title:'Forest compositions', date:'Dec 2025', read:'6 min', excerpt:'Layering, leading lines, and taming visual chaos under canopy.'},
+      {cover:"kuru.jpeg", title:'Ethics with wildlife', date:'Nov 2025', read:'4 min', excerpt:'Distance, disturbance, and the shots you should walk away from.'}
+    ];
+
+    // Populate gallery
+    const grid = document.getElementById('galleryGrid');
+    function renderGallery(items){
+      grid.innerHTML = items.map((p,i)=>`
+        <figure class="card" data-index="${i}" data-tag="${p.tag}">
+          <img src="${p.src}" alt="${p.title}" loading="lazy">
+          <figcaption class="meta">
+            <span>${p.title}</span>
+            <span>${p.tag}</span>
+          </figcaption>
+        </figure>
+      `).join('');
+    }
+    renderGallery(photos);
+
+    // Filters
+    document.querySelectorAll('.filters .btn').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const tag = btn.dataset.filter;
+        if(tag==='all'){ renderGallery(photos); }
+        else{ renderGallery(photos.filter(p=>p.tag===tag)); }
+        attachLightboxHandlers();
+      });
+    });
+
+    // Lightbox
+    const lightbox = document.getElementById('lightbox');
+    const lbImg = document.getElementById('lightboxImg');
+    const lbCap = document.getElementById('lightboxCaption');
+    const lbClose = document.getElementById('lightboxClose');
+    const lbPrev = document.getElementById('lightboxPrev');
+    const lbNext = document.getElementById('lightboxNext');
+    let currentIndex = 0;
+    function openLightbox(index){
+      const cards = [...document.querySelectorAll('#galleryGrid .card')];
+      const card = cards[index];
+      if(!card) return;
+      currentIndex = index;
+      const img = card.querySelector('img');
+      const title = card.querySelector('.meta span').textContent;
+      lbImg.src = img.src;
+      lbImg.alt = img.alt;
+      lbCap.textContent = title;
+      lightbox.classList.add('open');
+      document.body.style.overflow='hidden';
+    }
+    function closeLightbox(){
+      lightbox.classList.remove('open');
+      document.body.style.overflow='';
+    }
+    function attachLightboxHandlers(){
+      document.querySelectorAll('#galleryGrid .card').forEach((card, i)=>{
+        card.querySelector('img').addEventListener('click', ()=>openLightbox(i));
+      });
+    }
+    attachLightboxHandlers();
+
+    lbClose.addEventListener('click', closeLightbox);
+    lightbox.addEventListener('click', (e)=>{ if(e.target===lightbox) closeLightbox(); });
+    lbPrev.addEventListener('click', ()=>{
+      const cards = document.querySelectorAll('#galleryGrid .card');
+      currentIndex = (currentIndex - 1 + cards.length) % cards.length;
+      openLightbox(currentIndex);
+    });
+    lbNext.addEventListener('click', ()=>{
+      const cards = document.querySelectorAll('#galleryGrid .card');
+      currentIndex = (currentIndex + 1) % cards.length;
+      openLightbox(currentIndex);
+    });
+    document.addEventListener('keydown', (e)=>{
+      if(!lightbox.classList.contains('open')) return;
+      if(e.key==='Escape') closeLightbox();
+      if(e.key==='ArrowLeft') lbPrev.click();
+      if(e.key==='ArrowRight') lbNext.click();
+    });
+
+    // Populate blog
+    const blogGrid = document.getElementById('blogGrid');
+    blogGrid.innerHTML = posts.map(p=>`
+      <article class="post">
+        <img src="${p.cover}" alt="${p.title}" loading="lazy">
+        <div class="content">
+          <h3 class="title">${p.title}</h3>
+          <p class="excerpt">${p.excerpt}</p>
+          <div class="meta"><span>${p.date}</span> • <span>${p.read}</span></div>
+          <div style="margin-top:10px; display:flex; gap:8px">
+            <a class="btn" href="#">Read</a>
+            <a class="btn" href="#">Share</a>
+          </div>
+        </div>
+      </article>
+    `).join('');
+
+    // Contact form (client-side validation + demo submit)
+    const form = document.getElementById('contactForm');
+    const notice = document.getElementById('formNotice');
+    form.addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      const data = Object.fromEntries(new FormData(form).entries());
+      // Simple validation
+      if(!data.name || !data.email || !data.message){
+        notice.textContent = 'Please fill in name, email, and message.';
+        notice.style.color = '#ffb3b3';
+        return;
+      }
+      notice.textContent = 'Sending…';
+      notice.style.color = 'var(--muted)';
+      // Demo: simulate network
+      await new Promise(r=>setTimeout(r, 1000));
+      notice.textContent = 'Thanks! Your inquiry has been received.';
+      notice.style.color = '#5bd1a8';
+      form.reset();
+    });
+
+    // Theme toggle (light/dark)
+    const themeToggle = document.getElementById('themeToggle');
+    const lightVars = {
+      '--bg':'#f6f8fb','--card':'#ffffff','--text':'#0f1216','--muted':'#4b5565','--accent':'#2ecc71','--accent-2':'#4c8dff','--border':'#e6e9ef'
+    };
+    const darkVars = {
+      '--bg':'#0f1216','--card':'#151a21','--text':'#e9eef6','--muted':'#a9b3c1','--accent':'#5bd1a8','--accent-2':'#7aa7ff','--border':'#222832'
+    };
+    function setTheme(vars){
+      Object.entries(vars).forEach(([k,v])=>document.documentElement.style.setProperty(k,v));
+    }
+    let dark = true;
+    themeToggle.addEventListener('click', ()=>{
+      dark = !dark;
+      setTheme(dark ? darkVars : lightVars);
+      themeToggle.textContent = dark ? 'Dark' : 'Light';
+    });
+
+    // Mobile menu
+    const menuToggle = document.getElementById('menuToggle');
+    const mobileMenu = document.getElementById('mobileMenu');
+    menuToggle.addEventListener('click', ()=>{
+      mobileMenu.classList.toggle('open');
+    });
+    mobileMenu.querySelectorAll('a').forEach(a=>a.addEventListener('click', ()=>mobileMenu.classList.remove('open')));
+
+    // Footer year
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Intersection fade-in (nice touch)
+    const observer = new IntersectionObserver((entries)=>{
+      entries.forEach(e=>{
+        if(e.isIntersecting){
+          e.target.style.transition='opacity .6s ease, transform .6s ease';
+          e.target.style.opacity='1';
+          e.target.style.transform='translateY(0)';
+          observer.unobserve(e.target);
+        }
+      });
+    }, {threshold:.15});
+    document.querySelectorAll('.card, .post, .bio, .stat').forEach(el=>{
+      el.style.opacity='0'; el.style.transform='translateY(10px)'; observer.observe(el);
+    });
+  </script>
+</body>
+</html>
